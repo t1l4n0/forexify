@@ -1,0 +1,116 @@
+{% comment %}
+  Forexify Exchange Rate Bar
+  Displays DKK/EUR and SEK/EUR rates from ECB
+{% endcomment %}
+
+{{ 'forexify-bar.css' | asset_url | stylesheet_tag }}
+
+<div id="forexify-bar" class="forexify-bar forexify-bar--{{ block.settings.position }}" 
+     style="background-color: {{ block.settings.bar_color }}; color: {{ block.settings.text_color }};">
+  <div class="forexify-bar__content">
+    <span class="forexify-bar__label">{{ block.settings.title }}</span>
+    
+    {% if block.settings.show_dkk %}
+      <span class="forexify-bar__rate" id="forexify-dkk">
+        🇩🇰 DKK/EUR: <span class="forexify-rate-value">Loading...</span>
+      </span>
+    {% endif %}
+    
+    {% if block.settings.show_sek %}
+      <span class="forexify-bar__rate" id="forexify-sek">
+        🇸🇪 SEK/EUR: <span class="forexify-rate-value">Loading...</span>
+      </span>
+    {% endif %}
+    
+    <span class="forexify-bar__source">Source: ECB</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const API_URL = '{{ shop.url }}/apps/forexify/api/forexify';
+  
+  async function fetchRates() {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      
+      if (data.rates) {
+        {% if block.settings.show_dkk %}
+        const dkkRate = data.rates.DKK;
+        if (dkkRate) {
+          document.querySelector('#forexify-dkk .forexify-rate-value').textContent = dkkRate.toFixed(4);
+        }
+        {% endif %}
+        
+        {% if block.settings.show_sek %}
+        const sekRate = data.rates.SEK;
+        if (sekRate) {
+          document.querySelector('#forexify-sek .forexify-rate-value').textContent = sekRate.toFixed(4);
+        }
+        {% endif %}
+      }
+    } catch (error) {
+      console.error('Forexify: Failed to fetch rates', error);
+      document.querySelectorAll('.forexify-rate-value').forEach(el => {
+        el.textContent = 'N/A';
+      });
+    }
+  }
+  
+  // Fetch on load
+  fetchRates();
+  
+  // Refresh every hour
+  setInterval(fetchRates, 3600000);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Forexify Exchange Rate Bar",
+  "target": "head",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Bar Title",
+      "default": "Live Exchange Rates"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dkk",
+      "label": "Show DKK/EUR",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sek",
+      "label": "Show SEK/EUR",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Bar Position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "color",
+      "id": "bar_color",
+      "label": "Bar Background Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    }
+  ]
+}
+{% endschema %}
