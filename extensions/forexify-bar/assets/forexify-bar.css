@@ -1,49 +1,12 @@
 /* Forexify Exchange Rate Bar - Built for Shopify */
 
 .forexify-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
   width: 100%;
   padding: 12px 20px;
   font-family: var(--font-body-family), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease;
-}
-
-.forexify-bar--top {
-  top: 0;
-  animation: forexify-slide-down 0.4s ease-out;
-}
-
-.forexify-bar--bottom {
-  bottom: 0;
-  animation: forexify-slide-up 0.4s ease-out;
-}
-
-@keyframes forexify-slide-down {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes forexify-slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .forexify-bar__content {
@@ -139,11 +102,6 @@
   .forexify-bar__rates {
     justify-content: center;
   }
-}
-
-/* Adjust for Shopify admin bar when previewing */
-.shopify-preview-bar ~ .forexify-bar--top {
-  top: 40px;
 }
 
 /* Hide if no rates available */

@@ -22,7 +22,6 @@ model ForexifySettings {
   id        String   @id @default(uuid())
   shop      String   @unique
   currencies String
-  position  String   @default("top")
   barColor  String   @default("#1a1a1a")
   textColor String   @default("#ffffff")
   title     String   @default("Live Exchange Rates")

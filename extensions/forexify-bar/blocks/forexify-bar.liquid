@@ -1,13 +1,13 @@
 {% comment %}
   Forexify Exchange Rate Bar
-  Displays ECB exchange rates in storefront
+  Displays ECB exchange rates - place in header via Theme Editor
 {% endcomment %}
 
 {{ 'forexify-bar.css' | asset_url | stylesheet_tag }}
 
 <div 
   id="forexify-bar" 
-  class="forexify-bar forexify-bar--{{ block.settings.position }}" 
+  class="forexify-bar"
   style="background-color: {{ block.settings.bar_color }}; color: {{ block.settings.text_color }};"
   data-shop="{{ shop.permanent_domain }}"
 >
@@ -105,7 +105,7 @@
 {% schema %}
 {
   "name": "Forexify Rate Bar",
-  "target": "body",
+  "target": "section",
   "settings": [
     {
       "type": "text",
@@ -119,16 +119,6 @@
       "label": "Currencies (comma-separated)",
       "default": "DKK,SEK",
       "info": "Available: DKK, SEK, USD, GBP, CHF, JPY, NOK, PLN, CZK, HUF, AUD, CAD, NZD, CNY, SGD"
-    },
-    {
-      "type": "select",
-      "id": "position",
-      "label": "Bar Position",
-      "options": [
-        { "value": "top", "label": "Top of page" },
-        { "value": "bottom", "label": "Bottom of page" }
-      ],
-      "default": "top"
     },
     {
       "type": "color",

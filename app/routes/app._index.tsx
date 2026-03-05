@@ -47,7 +47,6 @@ interface LoaderData {
   shop: string;
   settings: {
     currencies: string[];
-    position: string;
     barColor: string;
     textColor: string;
     title: string;
@@ -66,7 +65,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       data: {
         shop: session.shop,
         currencies: JSON.stringify(["DKK", "SEK"]),
-        position: "top",
         barColor: "#1a1a1a",
         textColor: "#ffffff",
         title: "Live Exchange Rates",
@@ -78,7 +76,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     shop: session.shop,
     settings: {
       currencies: JSON.parse(settings.currencies),
-      position: settings.position,
       barColor: settings.barColor,
       textColor: settings.textColor,
       title: settings.title,
@@ -91,7 +88,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const currencies = formData.get("currencies") as string;
-  const position = formData.get("position") as string;
   const barColor = formData.get("barColor") as string;
   const textColor = formData.get("textColor") as string;
   const title = formData.get("title") as string;
@@ -100,7 +96,6 @@ export async function action({ request }: ActionFunctionArgs) {
     where: { shop: session.shop },
     update: {
       currencies,
-      position,
       barColor,
       textColor,
       title,
@@ -108,7 +103,6 @@ export async function action({ request }: ActionFunctionArgs) {
     create: {
       shop: session.shop,
       currencies,
-      position,
       barColor,
       textColor,
       title,
@@ -127,7 +121,6 @@ export default function ForexifySettings() {
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>(
     settings.currencies
   );
-  const [position, setPosition] = useState(settings.position);
   const [barColor, setBarColor] = useState({
     hue: 0,
     saturation: 0,
@@ -153,7 +146,6 @@ export default function ForexifySettings() {
   const handleSave = () => {
     const formData = new FormData();
     formData.append("currencies", JSON.stringify(selectedCurrencies));
-    formData.append("position", position);
     formData.append("barColor", settings.barColor);
     formData.append("textColor", settings.textColor);
     formData.append("title", title);
@@ -208,16 +200,6 @@ export default function ForexifySettings() {
                 onChange={setTitle}
                 autoComplete="off"
                 helpText="Displayed before the exchange rates"
-              />
-
-              <Select
-                label="Bar Position"
-                options={[
-                  { label: "Top of page", value: "top" },
-                  { label: "Bottom of page", value: "bottom" },
-                ]}
-                value={position}
-                onChange={setPosition}
               />
             </BlockStack>
           </Card>
