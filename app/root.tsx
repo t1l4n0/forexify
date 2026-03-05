@@ -9,7 +9,6 @@ import {
 } from "@remix-run/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import { AppProvider as AppBridgeAppProvider } from "@shopify/app-bridge-react";
 import { authenticate } from "./shopify.server";
 
 export const links = () => [
@@ -26,8 +25,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function App() {
-  const { apiKey, shop } = useLoaderData<typeof loader>();
-
   return (
     <html>
       <head>
@@ -37,17 +34,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <AppBridgeAppProvider
-          config={{
-            apiKey: apiKey || "",
-            host: shop || "",
-            forceRedirect: true,
-          }}
-        >
-          <PolarisAppProvider i18n={{}} >
-            <Outlet />
-          </PolarisAppProvider>
-        </AppBridgeAppProvider>
+        <PolarisAppProvider i18n={{}} >
+          <Outlet />
+        </PolarisAppProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

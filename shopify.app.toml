@@ -2,7 +2,7 @@
 
 name = "Forexify"
 client_id = "a1b6705c57793bad21ca4b4138c42ca1"
-application_url = "https://example.com"
+application_url = "https://forexify.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = "write_products,read_themes,write_themes,read_metaobjects,write_metaobj
 
 [auth]
 redirect_urls = [
-  "https://your-app-url.com/auth/callback",
-  "https://your-app-url.com/auth/shopify/callback",
-  "https://your-app-url.com/api/auth/callback"
+  "https://forexify.fly.dev/auth/callback",
+  "https://forexify.fly.dev/auth/shopify/callback",
+  "https://forexify.fly.dev/api/auth/callback"
 ]
 
 [webhooks]
