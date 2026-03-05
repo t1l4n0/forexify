@@ -1,109 +1,111 @@
-# Forexify - Shopify Exchange Rate App
+# Forexify - Built for Shopify
 
-Display live ECB exchange rates (DKK/EUR, SEK/EUR) in your Shopify store.
+A production-ready Shopify app displaying live ECB exchange rates in your storefront. Built with official Shopify React template, Polaris UI, and TypeScript.
 
 ## Features
 
-- 🔄 Live exchange rates from European Central Bank
-- 🇩🇰 DKK/EUR rate display
-- 🇸🇪 SEK/EUR rate display
-- 🎨 Customizable colors and position
-- 📱 Mobile responsive
-- ⚡ Auto-refresh every hour
-- 🛡️ Fallback if ECB API is unavailable
+- ✅ **Built for Shopify** compliant
+- 🎨 **Polaris UI** components throughout
+- 🔄 **31 ECB currencies** available (DKK, SEK, USD, GBP, CHF, JPY, and more)
+- 📱 **Responsive** storefront bar
+- ⚡ **Hourly auto-refresh** with caching
+- 🛡️ **Fallback** for ECB API outages
+- 💾 **Prisma database** for settings
+- 🎯 **Theme App Extension** for easy customization
+
+## Tech Stack
+
+- **Framework:** Remix + React + TypeScript
+- **UI:** Shopify Polaris + App Bridge
+- **Database:** Prisma + SQLite
+- **API:** European Central Bank XML feed
+- **Deployment:** Shopify CLI
 
 ## Installation
 
-### 1. Clone the repository
+### 1. Clone and setup
 ```bash
 git clone https://github.com/t1l4n0/forexify.git
 cd forexify
-```
-
-### 2. Install dependencies
-```bash
 npm install
 ```
 
-### 3. Configure environment variables
+### 2. Configure environment
 ```bash
 cp .env.example .env
 ```
-Edit `.env` and add your Shopify API credentials:
-- `SHOPIFY_API_KEY`
-- `SHOPIFY_API_SECRET`
-- `SHOPIFY_APP_URL`
+Edit `.env`:
+```
+SHOPIFY_API_KEY=your_key
+SHOPIFY_API_SECRET=your_secret
+SHOPIFY_APP_URL=https://your-app.com
+DATABASE_URL="file:./dev.sqlite"
+```
 
-### 4. Register the app with Shopify
+### 3. Setup database
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### 4. Connect to Shopify
 ```bash
 npx shopify app config link
 ```
 
-### 5. Deploy the theme app extension
+### 5. Deploy extension
 ```bash
 npx shopify app deploy
 ```
 
-### 6. Install in your test shop
+### 6. Start dev server
 ```bash
 npx shopify app dev
 ```
 
-## Usage
-
-After installation:
+## Storefront Setup
 
 1. Go to **Online Store > Themes > Customize**
-2. Click **Add section** or **Add block**
+2. Click **Add Section**
 3. Select **Forexify Exchange Rate Bar**
-4. Configure:
-   - Which currencies to display (DKK, SEK)
-   - Bar position (top/bottom)
-   - Colors
-   - Custom title
+4. Configure currencies, colors, position
 
-## How It Works
+## Available Currencies
 
-The app fetches exchange rates from the ECB's public XML feed:
-`https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml`
-
-Rates are cached for 1 hour to minimize API calls and ensure fast loading.
+DKK, SEK, USD, GBP, CHF, JPY, NOK, PLN, CZK, HUF, AUD, CAD, NZD, CNY, SGD, and 16 more from ECB.
 
 ## File Structure
 
 ```
 forexify/
-├── app/                          # Remix backend
+├── app/
 │   ├── routes/
-│   │   ├── app._index.jsx       # Admin settings page
-│   │   ├── app.jsx              # App layout
-│   │   └── api.forexify.jsx     # Exchange rate API
-│   ├── root.jsx                 # Root layout
-│   └── shopify.server.js        # Shopify config
+│   │   ├── app._index.tsx      # Admin settings (Polaris)
+│   │   ├── api.forexify.tsx    # Exchange rate API
+│   │   ├── api.proxy.tsx       # App proxy for storefront
+│   │   └── webhooks.tsx        # Webhook handlers
+│   ├── db.server.ts            # Prisma client
+│   ├── root.tsx                # Root with Polaris + App Bridge
+│   └── shopify.server.ts       # Shopify app config
 ├── extensions/
-│   └── forexify-bar/            # Theme app extension
-│       ├── assets/
-│       │   └── forexify-bar.css # Styling
+│   └── forexify-bar/           # Theme app extension
 │       ├── blocks/
-│       │   └── forexify-bar.liquid  # Storefront block
-│       └── shopify.extension.toml
-├── shopify.app.toml             # App config
-└── package.json
+│       │   └── forexify-bar.liquid
+│       └── assets/
+│           └── forexify-bar.css
+└── prisma/
+    └── schema.prisma
 ```
 
-## Customization
+## Built for Shopify Checklist
 
-### Adding More Currencies
-
-Edit `app/routes/api.forexify.jsx` and add more currencies to the parser.
-
-### Styling
-
-Edit `extensions/forexify-bar/assets/forexify-bar.css` to customize the appearance.
-
-## Support
-
-For issues or feature requests, please open an issue on GitHub.
+- ✅ Polaris React components
+- ✅ App Bridge integration
+- ✅ TypeScript
+- ✅ Database for persistence
+- ✅ Error handling
+- ✅ Webhook handling
+- ✅ Responsive design
 
 ## License
 
