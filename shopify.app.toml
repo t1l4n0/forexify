@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 name = "Forexify"
-client_id = "YOUR_CLIENT_ID_HERE"
-application_url = "https://your-app-url.com"
+client_id = "a1b6705c57793bad21ca4b4138c42ca1"
+application_url = "https://example.com"
 embedded = true
 
 [access_scopes]
@@ -23,12 +23,8 @@ api_version = "2024-10"
   topics = [ "app/uninstalled" ]
   uri = "/webhooks"
 
-[app_proxy]
-url = "https://your-app-url.com/api/proxy"
-subpath = "forexify"
-
 [pos]
 embedded = false
 
 [build]
-dev_store_url = "YOUR-DEV-SHOP.myshopify.com"
+dev_store_url = "t1l4n0d3v.myshopify.com"
