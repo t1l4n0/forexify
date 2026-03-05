@@ -1,6 +1,7 @@
-{
-  "name": "forexify-bar",
-  "type": "theme_app_extension",
-  "version": "1.0.0",
-  "description": "Display ECB exchange rates in a storefront bar"
-}
+api_version = "2024-10"
+
+[[extensions]]
+handle = "forexify-bar"
+name = "Forexify Exchange Rate Bar"
+uid = "f44b9aad-f37a-9a14-21dd-cd89d20c2c3f850ceb08"
+type = "theme_app_extension"
