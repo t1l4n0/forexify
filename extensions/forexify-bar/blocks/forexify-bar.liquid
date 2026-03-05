@@ -1,65 +1,101 @@
 {% comment %}
   Forexify Exchange Rate Bar
-  Displays DKK/EUR and SEK/EUR rates from ECB
+  Displays ECB exchange rates in storefront
 {% endcomment %}
 
 {{ 'forexify-bar.css' | asset_url | stylesheet_tag }}
 
-<div id="forexify-bar" class="forexify-bar forexify-bar--{{ block.settings.position }}" 
-     style="background-color: {{ block.settings.bar_color }}; color: {{ block.settings.text_color }};">
-  <div class="forexify-bar__content">
-    <span class="forexify-bar__label">{{ block.settings.title }}</span>
+<div 
+  id="forexify-bar" 
+  class="forexify-bar forexify-bar--{{ block.settings.position }}" 
+  style="background-color: {{ block.settings.bar_color }}; color: {{ block.settings.text_color }};"
+  data-shop="{{ shop.permanent_domain }}"
+>
+  <div class="forexify-bar__content page-width">
+    <span class="forexify-bar__title">{{ block.settings.title }}</span>
     
-    {% if block.settings.show_dkk %}
-      <span class="forexify-bar__rate" id="forexify-dkk">
-        🇩🇰 DKK/EUR: <span class="forexify-rate-value">Loading...</span>
-      </span>
-    {% endif %}
+    <div class="forexify-bar__rates" id="forexify-rates">
+      <span class="forexify-bar__loading">Loading rates...</span>
+    </div>
     
-    {% if block.settings.show_sek %}
-      <span class="forexify-bar__rate" id="forexify-sek">
-        🇸🇪 SEK/EUR: <span class="forexify-rate-value">Loading...</span>
-      </span>
-    {% endif %}
-    
-    <span class="forexify-bar__source">Source: ECB</span>
+    <span class="forexify-bar__source">ECB</span>
   </div>
 </div>
 
 <script>
 (function() {
-  const API_URL = '{{ shop.url }}/apps/forexify/api/forexify';
+  'use strict';
+  
+  const shopDomain = document.getElementById('forexify-bar')?.dataset.shop;
+  if (!shopDomain) return;
+  
+  const PROXY_URL = `/apps/forexify/api/forexify`;
+  const CURRENCIES = {{ block.settings.currencies | split: ',' | json }};
+  const CURRENCY_NAMES = {
+    'DKK': '🇩🇰 DKK/EUR',
+    'SEK': '🇸🇪 SEK/EUR',
+    'USD': '🇺🇸 USD/EUR',
+    'GBP': '🇬🇧 GBP/EUR',
+    'CHF': '🇨🇭 CHF/EUR',
+    'JPY': '🇯🇵 JPY/EUR',
+    'NOK': '🇳🇴 NOK/EUR',
+    'PLN': '🇵🇱 PLN/EUR',
+    'CZK': '🇨🇿 CZK/EUR',
+    'HUF': '🇭🇺 HUF/EUR',
+    'AUD': '🇦🇺 AUD/EUR',
+    'CAD': '🇨🇦 CAD/EUR',
+    'NZD': '🇳🇿 NZD/EUR',
+    'CNY': '🇨🇳 CNY/EUR',
+    'SGD': '🇸🇬 SGD/EUR'
+  };
   
   async function fetchRates() {
     try {
-      const response = await fetch(API_URL);
+      const currencyParam = CURRENCIES.join(',');
+      const response = await fetch(`${PROXY_URL}?currencies=${currencyParam}`);
+      
+      if (!response.ok) throw new Error('Failed to fetch');
+      
       const data = await response.json();
       
       if (data.rates) {
-        {% if block.settings.show_dkk %}
-        const dkkRate = data.rates.DKK;
-        if (dkkRate) {
-          document.querySelector('#forexify-dkk .forexify-rate-value').textContent = dkkRate.toFixed(4);
-        }
-        {% endif %}
-        
-        {% if block.settings.show_sek %}
-        const sekRate = data.rates.SEK;
-        if (sekRate) {
-          document.querySelector('#forexify-sek .forexify-rate-value').textContent = sekRate.toFixed(4);
-        }
-        {% endif %}
+        renderRates(data.rates);
+      } else {
+        showError();
       }
     } catch (error) {
-      console.error('Forexify: Failed to fetch rates', error);
-      document.querySelectorAll('.forexify-rate-value').forEach(el => {
-        el.textContent = 'N/A';
-      });
+      console.error('Forexify:', error);
+      showError();
     }
   }
   
-  // Fetch on load
-  fetchRates();
+  function renderRates(rates) {
+    const container = document.getElementById('forexify-rates');
+    if (!container) return;
+    
+    const ratesHtml = Object.entries(rates)
+      .map(([code, rate]) => {
+        const label = CURRENCY_NAMES[code] || `${code}/EUR`;
+        return `<span class="forexify-bar__rate">${label}: <strong>${rate.toFixed(4)}</strong></span>`;
+      })
+      .join('');
+    
+    container.innerHTML = ratesHtml;
+  }
+  
+  function showError() {
+    const container = document.getElementById('forexify-rates');
+    if (container) {
+      container.innerHTML = '<span class="forexify-bar__error">Rates temporarily unavailable</span>';
+    }
+  }
+  
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchRates);
+  } else {
+    fetchRates();
+  }
   
   // Refresh every hour
   setInterval(fetchRates, 3600000);
@@ -69,7 +105,7 @@
 {% schema %}
 {
   "name": "Forexify Exchange Rate Bar",
-  "target": "head",
+  "target": "body",
   "settings": [
     {
       "type": "text",
@@ -78,31 +114,26 @@
       "default": "Live Exchange Rates"
     },
     {
-      "type": "checkbox",
-      "id": "show_dkk",
-      "label": "Show DKK/EUR",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_sek",
-      "label": "Show SEK/EUR",
-      "default": true
+      "type": "textarea",
+      "id": "currencies",
+      "label": "Currencies (comma-separated)",
+      "default": "DKK,SEK",
+      "info": "Available: DKK, SEK, USD, GBP, CHF, JPY, NOK, PLN, CZK, HUF, AUD, CAD, NZD, CNY, SGD"
     },
     {
       "type": "select",
       "id": "position",
       "label": "Bar Position",
       "options": [
-        { "value": "top", "label": "Top" },
-        { "value": "bottom", "label": "Bottom" }
+        { "value": "top", "label": "Top of page" },
+        { "value": "bottom", "label": "Bottom of page" }
       ],
       "default": "top"
     },
     {
       "type": "color",
       "id": "bar_color",
-      "label": "Bar Background Color",
+      "label": "Background Color",
       "default": "#1a1a1a"
     },
     {

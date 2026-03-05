@@ -1,71 +1,128 @@
-/* Forexify Exchange Rate Bar Styles */
+/* Forexify Exchange Rate Bar - Built for Shopify */
 
 .forexify-bar {
   position: fixed;
   left: 0;
   right: 0;
   width: 100%;
-  padding: 10px 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  padding: 12px 20px;
+  font-family: var(--font-body-family), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
-  z-index: 999999;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  line-height: 1.5;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
 }
 
 .forexify-bar--top {
   top: 0;
+  animation: forexify-slide-down 0.4s ease-out;
 }
 
 .forexify-bar--bottom {
   bottom: 0;
+  animation: forexify-slide-up 0.4s ease-out;
+}
+
+@keyframes forexify-slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes forexify-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .forexify-bar__content {
-  max-width: 1200px;
+  max-width: var(--page-width, 1200px);
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
-.forexify-bar__label {
+.forexify-bar__title {
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+.forexify-bar__rates {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .forexify-bar__rate {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
-.forexify-rate-value {
-  font-family: 'Courier New', monospace;
+.forexify-bar__rate strong {
+  font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  padding: 2px 8px;
-  background: rgba(255,255,255,0.15);
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
+  font-size: 13px;
+}
+
+.forexify-bar__loading {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.forexify-bar__error {
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 .forexify-bar__source {
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: 10px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   margin-left: auto;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .forexify-bar__content {
-    gap: 15px;
-    font-size: 12px;
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+  .forexify-bar {
+    padding: 10px 15px;
+    font-size: 13px;
   }
   
-  .forexify-bar {
-    padding: 8px 10px;
+  .forexify-bar__content {
+    gap: 15px;
+  }
+  
+  .forexify-bar__rates {
+    gap: 12px;
+  }
+  
+  .forexify-bar__rate strong {
+    font-size: 12px;
+    padding: 2px 6px;
   }
   
   .forexify-bar__source {
@@ -73,16 +130,23 @@
   }
 }
 
-/* Push body content down when bar is at top */
-.forexify-bar--top {
-  animation: forexify-slide-down 0.3s ease-out;
+@media screen and (max-width: 480px) {
+  .forexify-bar__title {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .forexify-bar__rates {
+    justify-content: center;
+  }
 }
 
-@keyframes forexify-slide-down {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+/* Adjust for Shopify admin bar when previewing */
+.shopify-preview-bar ~ .forexify-bar--top {
+  top: 40px;
+}
+
+/* Hide if no rates available */
+.forexify-bar--empty {
+  display: none;
 }
