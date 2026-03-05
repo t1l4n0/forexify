@@ -3,53 +3,42 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import {
-  Bleed,
   BlockStack,
   Box,
   Button,
   Card,
   Checkbox,
-  ColorPicker,
-  Divider,
-  InlineGrid,
   Layout,
   Page,
-  Select,
   Text,
-  TextField,
   Banner,
-  Badge,
-  Spinner,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
 
 // ECB verfügbare Währungen
 const AVAILABLE_CURRENCIES = [
-  { value: "DKK", label: "🇩🇰 Danish Krone (DKK/EUR)", flag: "🇩🇰" },
-  { value: "SEK", label: "🇸🇪 Swedish Krona (SEK/EUR)", flag: "🇸🇪" },
-  { value: "USD", label: "🇺🇸 US Dollar (USD/EUR)", flag: "🇺🇸" },
-  { value: "GBP", label: "🇬🇧 British Pound (GBP/EUR)", flag: "🇬🇧" },
-  { value: "CHF", label: "🇨🇭 Swiss Franc (CHF/EUR)", flag: "🇨🇭" },
-  { value: "JPY", label: "🇯🇵 Japanese Yen (JPY/EUR)", flag: "🇯🇵" },
-  { value: "NOK", label: "🇳🇴 Norwegian Krone (NOK/EUR)", flag: "🇳🇴" },
-  { value: "PLN", label: "🇵🇱 Polish Zloty (PLN/EUR)", flag: "🇵🇱" },
-  { value: "CZK", label: "🇨🇿 Czech Koruna (CZK/EUR)", flag: "🇨🇿" },
-  { value: "HUF", label: "🇭🇺 Hungarian Forint (HUF/EUR)", flag: "🇭🇺" },
-  { value: "AUD", label: "🇦🇺 Australian Dollar (AUD/EUR)", flag: "🇦🇺" },
-  { value: "CAD", label: "🇨🇦 Canadian Dollar (CAD/EUR)", flag: "🇨🇦" },
-  { value: "NZD", label: "🇳🇿 New Zealand Dollar (NZD/EUR)", flag: "🇳🇿" },
-  { value: "CNY", label: "🇨🇳 Chinese Yuan (CNY/EUR)", flag: "🇨🇳" },
-  { value: "SGD", label: "🇸🇬 Singapore Dollar (SGD/EUR)", flag: "🇸🇬" },
+  { value: "DKK", label: "🇩🇰 Danish Krone (DKK/EUR)" },
+  { value: "SEK", label: "🇸🇪 Swedish Krona (SEK/EUR)" },
+  { value: "USD", label: "🇺🇸 US Dollar (USD/EUR)" },
+  { value: "GBP", label: "🇬🇧 British Pound (GBP/EUR)" },
+  { value: "CHF", label: "🇨🇭 Swiss Franc (CHF/EUR)" },
+  { value: "JPY", label: "🇯🇵 Japanese Yen (JPY/EUR)" },
+  { value: "NOK", label: "🇳🇴 Norwegian Krone (NOK/EUR)" },
+  { value: "PLN", label: "🇵🇱 Polish Zloty (PLN/EUR)" },
+  { value: "CZK", label: "🇨🇿 Czech Koruna (CZK/EUR)" },
+  { value: "HUF", label: "🇭🇺 Hungarian Forint (HUF/EUR)" },
+  { value: "AUD", label: "🇦🇺 Australian Dollar (AUD/EUR)" },
+  { value: "CAD", label: "🇨🇦 Canadian Dollar (CAD/EUR)" },
+  { value: "NZD", label: "🇳🇿 New Zealand Dollar (NZD/EUR)" },
+  { value: "CNY", label: "🇨🇳 Chinese Yuan (CNY/EUR)" },
+  { value: "SGD", label: "🇸🇬 Singapore Dollar (SGD/EUR)" },
 ];
 
 interface LoaderData {
   shop: string;
   settings: {
     currencies: string[];
-    barColor: string;
-    textColor: string;
-    title: string;
   };
 }
 
@@ -65,9 +54,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       data: {
         shop: session.shop,
         currencies: JSON.stringify(["DKK", "SEK"]),
-        barColor: "#1a1a1a",
-        textColor: "#ffffff",
-        title: "Live Exchange Rates",
       },
     });
   }
@@ -76,9 +62,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     shop: session.shop,
     settings: {
       currencies: JSON.parse(settings.currencies),
-      barColor: settings.barColor,
-      textColor: settings.textColor,
-      title: settings.title,
     },
   });
 }
@@ -88,24 +71,13 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
 
   const currencies = formData.get("currencies") as string;
-  const barColor = formData.get("barColor") as string;
-  const textColor = formData.get("textColor") as string;
-  const title = formData.get("title") as string;
 
   await prisma.forexifySettings.upsert({
     where: { shop: session.shop },
-    update: {
-      currencies,
-      barColor,
-      textColor,
-      title,
-    },
+    update: { currencies },
     create: {
       shop: session.shop,
       currencies,
-      barColor,
-      textColor,
-      title,
     },
   });
 
@@ -121,19 +93,6 @@ export default function ForexifySettings() {
   const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>(
     settings.currencies
   );
-  const [barColor, setBarColor] = useState({
-    hue: 0,
-    saturation: 0,
-    brightness: 0.1,
-    alpha: 1,
-  });
-  const [textColor, setTextColor] = useState({
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  });
-  const [title, setTitle] = useState(settings.title);
 
   useEffect(() => {
     if (fetcher.data?.success) {
@@ -146,10 +105,6 @@ export default function ForexifySettings() {
   const handleSave = () => {
     const formData = new FormData();
     formData.append("currencies", JSON.stringify(selectedCurrencies));
-    formData.append("barColor", settings.barColor);
-    formData.append("textColor", settings.textColor);
-    formData.append("title", title);
-
     fetcher.submit(formData, { method: "POST" });
   };
 
@@ -172,7 +127,7 @@ export default function ForexifySettings() {
           loading={isSaving}
           disabled={selectedCurrencies.length === 0}
         >
-          Save Settings
+          Save
         </Button>
       }
     >
@@ -180,7 +135,7 @@ export default function ForexifySettings() {
         {showSuccess && (
           <Layout.Section>
             <Banner
-              title="Settings saved successfully"
+              title="Settings saved"
               tone="success"
               onDismiss={() => setShowSuccess(false)}
             />
@@ -191,33 +146,16 @@ export default function ForexifySettings() {
           <Card>
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">
-                Exchange Rate Bar Settings
-              </Text>
-              
-              <TextField
-                label="Bar Title"
-                value={title}
-                onChange={setTitle}
-                autoComplete="off"
-                helpText="Displayed before the exchange rates"
-              />
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">
                 Select Currencies
               </Text>
               
               <Text as="p" variant="bodyMd" tone="subdued">
                 Choose which exchange rates to display. Rates are updated hourly from the European Central Bank.
+                Layout settings (colors, fonts, alignment) are configured in the theme editor.
               </Text>
 
               <Box padding="200">
-                <InlineGrid columns={2} gap="200">
+                <BlockStack gap="200">
                   {AVAILABLE_CURRENCIES.map((currency) => (
                     <Checkbox
                       key={currency.value}
@@ -226,7 +164,7 @@ export default function ForexifySettings() {
                       onChange={() => toggleCurrency(currency.value)}
                     />
                   ))}
-                </InlineGrid>
+                </BlockStack>
               </Box>
 
               {selectedCurrencies.length === 0 && (
@@ -243,58 +181,18 @@ export default function ForexifySettings() {
           <Card>
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">
-                Appearance
-              </Text>
-
-              <InlineGrid columns={2} gap="400">
-                <Box>
-                  <Text as="p" variant="bodyMd" fontWeight="medium">
-                    Bar Background Color
-                  </Text>
-                  <Box padding="200" background="bg-surface" borderRadius="100">
-                    <ColorPicker
-                      onChange={setBarColor}
-                      color={barColor}
-                    />
-                  </Box>
-                </Box>
-
-                <Box>
-                  <Text as="p" variant="bodyMd" fontWeight="medium">
-                    Text Color
-                  </Text>
-                  <Box padding="200" background="bg-surface" borderRadius="100">
-                    <ColorPicker
-                      onChange={setTextColor}
-                      color={textColor}
-                    />
-                  </Box>
-                </Box>
-              </InlineGrid>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">
-                Installation
+                Theme Setup
               </Text>
               
-              <Text as="p" variant="bodyMd">
-                After saving, go to your theme editor to add the Forexify bar:
-              </Text>
-
               <BlockStack gap="200">
                 <Text as="p" variant="bodyMd">
-                  1. Go to <strong>Online Store > Themes > Customize</strong>
+                  1. Go to <strong>Online Store &gt; Themes &gt; Customize</strong>
                 </Text>
                 <Text as="p" variant="bodyMd">
-                  2. Click <strong>Add Section</strong>
+                  2. Add the <strong>Forexify Rate Bar</strong> block to your header
                 </Text>
                 <Text as="p" variant="bodyMd">
-                  3. Select <strong>Forexify Exchange Rate Bar</strong>
+                  3. Configure colors, font sizes, and alignment in the block settings
                 </Text>
               </BlockStack>
 

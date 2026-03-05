@@ -19,12 +19,9 @@ model Session {
 }
 
 model ForexifySettings {
-  id        String   @id @default(uuid())
-  shop      String   @unique
+  id         String   @id @default(uuid())
+  shop       String   @unique
   currencies String
-  barColor  String   @default("#1a1a1a")
-  textColor String   @default("#ffffff")
-  title     String   @default("Live Exchange Rates")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

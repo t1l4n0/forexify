@@ -1,14 +1,19 @@
 {% comment %}
   Forexify Exchange Rate Bar
-  Displays ECB exchange rates - place in header via Theme Editor
+  Displays ECB exchange rates - configured via block settings
 {% endcomment %}
 
 {{ 'forexify-bar.css' | asset_url | stylesheet_tag }}
 
 <div 
   id="forexify-bar" 
-  class="forexify-bar"
-  style="background-color: {{ block.settings.bar_color }}; color: {{ block.settings.text_color }};"
+  class="forexify-bar forexify-bar--{{ block.settings.alignment }}"
+  style="
+    background-color: {{ block.settings.background_color }}; 
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    padding: {{ block.settings.padding }}px 20px;
+  "
   data-shop="{{ shop.permanent_domain }}"
 >
   <div class="forexify-bar__content page-width">
@@ -90,14 +95,12 @@
     }
   }
   
-  // Initialize
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchRates);
   } else {
     fetchRates();
   }
   
-  // Refresh every hour
   setInterval(fetchRates, 3600000);
 })();
 </script>
@@ -121,8 +124,12 @@
       "info": "Available: DKK, SEK, USD, GBP, CHF, JPY, NOK, PLN, CZK, HUF, AUD, CAD, NZD, CNY, SGD"
     },
     {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
       "type": "color",
-      "id": "bar_color",
+      "id": "background_color",
       "label": "Background Color",
       "default": "#1a1a1a"
     },
@@ -131,6 +138,37 @@
       "id": "text_color",
       "label": "Text Color",
       "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Padding",
+      "min": 4,
+      "max": 30,
+      "step": 2,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
     }
   ]
 }
