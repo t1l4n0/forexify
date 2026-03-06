@@ -7,12 +7,14 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
-import { authenticate } from "./shopify.server";
+import { authenticate, addDocumentResponseHeaders } from "./shopify.server";
+
+export { addDocumentResponseHeaders };
 
 export const links = () => [
-  { 
-    rel: "stylesheet", 
-    href: "https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css" 
+  {
+    rel: "stylesheet",
+    href: "https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css"
   },
 ];
 
