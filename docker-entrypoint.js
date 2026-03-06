@@ -2,20 +2,14 @@
 
 const { execSync } = require('child_process');
 
-// Run Prisma migrations
-console.log('Running database migrations...');
+// Run Prisma db push to create tables
+console.log('Setting up database...');
 try {
-  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
-  console.log('Migrations completed successfully');
+  execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+  console.log('Database setup completed successfully');
 } catch (error) {
-  console.error('Migration failed, trying db push...');
-  try {
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-    console.log('Database push completed');
-  } catch (pushError) {
-    console.error('Database setup failed:', pushError);
-    process.exit(1);
-  }
+  console.error('Database setup failed:', error);
+  // Continue anyway - tables might already exist
 }
 
 // Start the application

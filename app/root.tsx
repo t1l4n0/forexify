@@ -5,23 +5,20 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
-import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import { authenticate } from "./shopify.server";
 
 export const links = () => [
-  { rel: "stylesheet", href: polarisStyles },
+  { 
+    rel: "stylesheet", 
+    href: "https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css" 
+  },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);
- 
-  return {
-    apiKey: process.env.SHOPIFY_API_KEY,
-    shop: new URL(request.url).searchParams.get("shop"),
-  };
+  return null;
 }
 
 export default function App() {

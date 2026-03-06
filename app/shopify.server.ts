@@ -16,9 +16,9 @@ const shopify = shopifyApp({
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   future: {
-    unstable_newEmbeddedAuthStrategy: true,
     removeRest: true,
   },
+  isEmbeddedApp: true,
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
     : {}),
